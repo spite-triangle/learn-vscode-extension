@@ -10,11 +10,18 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "testui" is now active!');
 
-	// 注册指令
-	let disposable = vscode.commands.registerCommand('testui.helloWorld', () => {
+	// 自定义指令
+	let disposable = vscode.commands.registerCommand('testui.custom',(msg:string)=>{
+		vscode.window.showInformationMessage(msg);
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('testui.helloWorld', () => {
 		// 执行 vscode 指令，可以传参，可以有返回值
 		vscode.commands.executeCommand("editor.action.addCommentLine");
 
+		// 传参执行
+		vscode.commands.executeCommand("testui.custom","fuck you");
 	});
 	context.subscriptions.push(disposable);
 	
@@ -28,10 +35,15 @@ export function activate(context: vscode.ExtensionContext) {
 				_token: vscode.CancellationToken
 			): vscode.ProviderResult<vscode.Hover> {
 				// 将指令字符串生成 uri 指令
-				// 指令字符串格式：command: 指令 ID
+				// 指令字符串格式：command: 指令ID
 				const commentCommandUri = vscode.Uri.parse(`command:editor.action.addCommentLine`);
+
+				// 传参
+				// command:指令ID ? 
+				const msgCommandUri = vscode.Uri.parse(`command:testui.custom?${encodeURIComponent(JSON.stringify("uri fuck"))}`);
+
 				// 生成 markdown 文本用于悬浮显示
-				const contents = new vscode.MarkdownString(`[Add comment](${commentCommandUri})`);
+				const contents = new vscode.MarkdownString(`[Add comment](${commentCommandUri})  [Show msg](${msgCommandUri})`);
 
 				// command URIs如果想在Markdown 内容中生效, 你必须设置`isTrusted`。
 				// 当创建可信的Markdown 字符, 请合理地清理所有的输入内容
@@ -42,8 +54,26 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}()
 	);
-	// 取消注册
 	context.subscriptions.push(disposable);
+	
+	disposable = vscode.commands.registerCommand('testui.inputbox',()=>{
+		// 输入框
+		vscode.window.showInputBox().then((value)=>{
+			if (value != undefined){
+				vscode.window.showInformationMessage(value);
+			}
+		});
+		
+		// 选择输入框
+		const strItems = ["fuck1","fuck2","fuck3"];
+		vscode.window.showQuickPick(strItems).then((value)=>{
+			if (value != undefined){
+				vscode.window.showInformationMessage(value);
+			}
+		});
+
+	});
+
 }
 
 // this method is called when your extension is deactivated

@@ -12,18 +12,32 @@
 	"categories": [
 		"Other"
 	],
+	// 啥时候启动插件
 	"activationEvents": [
 		"onCommand:testui.helloWorld"
 	],
 	// 插件入口
 	"main": "./out/extension.js",
+
+	// 插件配置
 	"contributes": {
+		// 可以在在 ctrl shit p 命令面板找到 title 选项，title 选项可以启动 command 
 		"commands": [
 			{
 				"command": "testui.helloWorld",
 				"title": "Hello World"
 			}
-		]
+		],
+
+		"menus": {
+			// 限制命令在 ctrl shit p 中的出现条件
+			"commandPalette": [
+				{
+					"command": "testui.helloWorld",
+					"when": "editorLangId == cpp"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
