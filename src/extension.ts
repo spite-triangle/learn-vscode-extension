@@ -63,7 +63,10 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showInformationMessage(value);
 			}
 		});
-		
+	});
+	context.subscriptions.push(disposable);
+
+	disposable = vscode.commands.registerCommand('testui.quickpick',()=>{
 		// 选择输入框
 		const strItems = ["fuck1","fuck2","fuck3"];
 		vscode.window.showQuickPick(strItems).then((value)=>{
@@ -73,7 +76,40 @@ export function activate(context: vscode.ExtensionContext) {
 		});
 
 	});
+	context.subscriptions.push(disposable);
 
+	disposable = vscode.commands.registerCommand('testui.customquickpick',()=>{
+		// 选项
+		const options : { [key:string] : string} = {
+			"option1":"fuck1",
+			"option2":"fuck2",
+			"option3":"fuck3",
+		};
+
+		// 自定义 quickpick
+		const quickpick = vscode.window.createQuickPick();
+
+		// 界面选项
+		quickpick.items = Object.keys(options).map( value => {
+			return  {label: value};
+		});
+
+		// 注册事件，有多选，因此是数组
+		quickpick.onDidChangeSelection((values)=>{
+			vscode.window.showInformationMessage(options[values[0].label]);
+			
+			// 隐藏
+			quickpick.hide();
+		});
+
+		// 丢弃ui
+		quickpick.onDidHide(() => quickpick.dispose());
+
+		quickpick.show();
+
+	});
+	context.subscriptions.push(disposable);
+	
 }
 
 // this method is called when your extension is deactivated

@@ -11,7 +11,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:testui.helloWorld"
+		"onLanguage:cpp"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -23,6 +23,10 @@
 			{
 				"command": "testui.inputbox",
 				"title": "input box"
+			},
+			{
+				"command": "testui.customquickpick",
+				"title": "custom quick"
 			}
 		],
 		"menus": {
@@ -30,6 +34,12 @@
 				{
 					"command": "testui.helloWorld",
 					"when": "editorLangId == cpp"
+				}
+			],
+			"editor/context": [
+				{
+					"command": "testui.customquickpick",
+					"group": "navigation"
 				}
 			]
 		}
