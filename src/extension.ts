@@ -110,6 +110,24 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 	
+	disposable = vscode.commands.registerCommand('testui.document',()=>{
+
+		// 当前激活的文本框
+		const editor = vscode.window.activeTextEditor;
+
+		// 鼠标位置
+		console.log(editor?.selection.active);	
+		
+		// 当前编辑框所能看见的文本范围
+		console.log(editor?.visibleRanges);	
+		
+		// 文本编辑
+		editor?.edit((editBuilder)=>{
+			editBuilder.insert(new vscode.Position(10,1),"fuck you");	
+		});
+	});
+	context.subscriptions.push(disposable);
+	
 }
 
 // this method is called when your extension is deactivated

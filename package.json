@@ -27,6 +27,10 @@
 			{
 				"command": "testui.customquickpick",
 				"title": "custom quick"
+			},
+			{
+				"command": "testui.document",
+				"title": "test document"
 			}
 		],
 		"menus": {
@@ -39,6 +43,10 @@
 			"editor/context": [
 				{
 					"command": "testui.customquickpick",
+					"group": "navigation"
+				},
+				{
+					"command": "testui.document",
 					"group": "navigation"
 				}
 			]
