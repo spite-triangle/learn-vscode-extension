@@ -25,37 +25,6 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 	
-	// 在指定文件格式下，显示悬停弹窗
-	disposable = vscode.languages.registerHoverProvider(
-		'cpp',
-		new class implements vscode.HoverProvider {
-			provideHover(
-				_document: vscode.TextDocument,
-				_position: vscode.Position,
-				_token: vscode.CancellationToken
-			): vscode.ProviderResult<vscode.Hover> {
-				// 将指令字符串生成 uri 指令
-				// 指令字符串格式：command: 指令ID
-				const commentCommandUri = vscode.Uri.parse(`command:editor.action.addCommentLine`);
-
-				// 传参
-				// command:指令ID ? 
-				const msgCommandUri = vscode.Uri.parse(`command:testui.custom?${encodeURIComponent(JSON.stringify("uri fuck"))}`);
-
-				// 生成 markdown 文本用于悬浮显示
-				const contents = new vscode.MarkdownString(`[Add comment](${commentCommandUri})  [Show msg](${msgCommandUri})`);
-
-				// command URIs如果想在Markdown 内容中生效, 你必须设置`isTrusted`。
-				// 当创建可信的Markdown 字符, 请合理地清理所有的输入内容
-				// 以便你期望的命令command URIs生效
-				contents.isTrusted = true;
-
-				return new vscode.Hover(contents);
-			}
-		}()
-	);
-	context.subscriptions.push(disposable);
-	
 	disposable = vscode.commands.registerCommand('testui.inputbox',()=>{
 		// 输入框
 		vscode.window.showInputBox().then((value)=>{
@@ -128,6 +97,69 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 	context.subscriptions.push(disposable);
 	
+	/* =====================LSP=========================== */
+	/* 
+		LSP (language server protocol)：代码的静态分析逻辑都放到了一个 language server 上，
+		server 的实现只要遵守 LSP 协议，vscode 执行时，就能从 server 上获取代码分析结果，实
+		现代码检查、自动补全、提示等功能。这么做的好处就是每个 editor 就是一个客户端，所有的
+		editor 分析代码都是从一个 language server 上获取结果。并且服务进行复杂运算，不会造成
+		vscode 卡死。 
+		LSP 有两种实现：LSP 的底层思想是 RPC (远程调用)
+		1. 直接调用 vscode api 来注册服务接口 vscode.languages.registerxxx()
+		2. 创建服务连接 const connection = createConnection(ProposedFeatures.all); ，然后
+		自定义服务连接
+	*/
+
+	// 在指定文件格式下，显示悬停弹窗
+	disposable = vscode.languages.registerHoverProvider(
+		'cpp',
+		new class implements vscode.HoverProvider {
+			provideHover(
+				_document: vscode.TextDocument,
+				_position: vscode.Position,
+				_token: vscode.CancellationToken
+			): vscode.ProviderResult<vscode.Hover> {
+				// 将指令字符串生成 uri 指令
+				// 指令字符串格式：command: 指令ID
+				const commentCommandUri = vscode.Uri.parse(`command:editor.action.addCommentLine`);
+
+				// 传参
+				// command:指令ID ? 
+				const msgCommandUri = vscode.Uri.parse(`command:testui.custom?${encodeURIComponent(JSON.stringify("uri fuck"))}`);
+
+				// 生成 markdown 文本用于悬浮显示
+				const contents = new vscode.MarkdownString(`[Add comment](${commentCommandUri})  [Show msg](${msgCommandUri})`);
+
+				// command URIs如果想在Markdown 内容中生效, 你必须设置`isTrusted`。
+				// 当创建可信的Markdown 字符, 请合理地清理所有的输入内容
+				// 以便你期望的命令command URIs生效
+				contents.isTrusted = true;
+
+				return new vscode.Hover(contents);
+			}
+		}()
+	);
+	context.subscriptions.push(disposable);
+	
+	// 代码补全
+	const provider = vscode.languages.registerCompletionItemProvider( 
+		'cpp',
+		{
+			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext)
+			{
+				console.log(document);
+				const commpleton1 = new vscode.CompletionItem("test()");
+				commpleton1.insertText = "fuck fuck you"
+
+				return [
+					commpleton1
+				];
+			}
+		}
+	 );
+	
+	// 添加
+	context.subscriptions.push(provider);
 }
 
 // this method is called when your extension is deactivated
